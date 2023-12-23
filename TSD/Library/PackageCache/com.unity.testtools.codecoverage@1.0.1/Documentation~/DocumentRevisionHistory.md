@@ -1,6 +1,3 @@
-# Document revision history
-
-|Date|Reason|
-|:---|:---|
-|Jun 16, 2021|<li>Added **Ignoring tests for Code Coverage** section.<li>Matches package version *1.0.1*.|
-|Mar 09, 2021|<li>Added **Quickstart** guide.<li>Matches package version *1.0.0*.|
+version https://git-lfs.github.com/spec/v1
+oid sha256:40f731f975f8634d48f40e4f43fbeb6a37a8ca34bb61a5ce46ab727f53587759
+size 245

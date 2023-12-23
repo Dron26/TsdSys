@@ -1,10 +1,3 @@
-// This file is generated. Do not modify by hand.
-// XML documentation file not found. To check if public methods have XML comments,
-// make sure the XML doc file is present and located next to the scraped dll
-namespace Unity.Services.Core.Analytics
-{
-    public static class AnalyticsOptionsExtensions
-    {
-        [System.Obsolete(@"SetAnalyticsUserId is deprecated. Please use UnityServices.ExternalUserId instead.", false)] public static InitializationOptions SetAnalyticsUserId(this InitializationOptions self, string id);
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:79e66c82673eda38db16ae609a8f45a2d067bbc7bf4beadc8952f0224753e161
+size 537

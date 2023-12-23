@@ -1,29 +1,3 @@
-using System.Xml.Serialization;
-using System.IO;
-using UnityEngine;
-using OpenCover.Framework.Model;
-using UnityEditor.TestTools.CodeCoverage.Utils;
-
-namespace UnityEditor.TestTools.CodeCoverage.OpenCover
-{
-    internal class OpenCoverResultWriter : CoverageResultWriterBase<CoverageSession>
-    {
-        public OpenCoverResultWriter(CoverageSettings coverageSettings) : base(coverageSettings)
-        {
-        }
-
-        public override void WriteCoverageSession()
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(CoverageSession));
-            string fileFullPath = GetNextFullFilePath();
-            using (TextWriter writer = new StreamWriter(fileFullPath))
-            {
-                serializer.Serialize(writer, CoverageSession);
-            }
-
-            ResultsLogger.Log(ResultID.Log_ResultsSaved, fileFullPath);
-
-            base.WriteCoverageSession();
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5d4ff7310c6073648da46a033269b9a75f1388a6b732b37e7fb02b7a48c4eb2d
+size 913
