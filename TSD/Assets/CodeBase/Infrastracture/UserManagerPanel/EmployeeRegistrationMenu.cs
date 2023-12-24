@@ -59,7 +59,7 @@ namespace CodeBase.Infrastracture.UserManagerPanel
             _CheckUpLogin.enabled = true;
         }
 
-        public void SwithState(bool state)
+        public void SwithPanelState(bool state)
         {
             _registrationPanel.gameObject.SetActive(state);
         }

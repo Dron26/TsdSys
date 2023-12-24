@@ -14,31 +14,32 @@ namespace CodeBase.Infrastracture
         [SerializeField] private EmployeeRegistrationMenu _employeeRegistrationMenu;
         [SerializeField] private EquipmentRegistrationMenu _equipmentRegistrationMenu;
         [SerializeField] private SwithMenu _switchMenu;
-        [SerializeField] private DataLoader _dataLoader;
+        [FormerlySerializedAs("_dataLoader")] [SerializeField] private AdminPanel _adminPanel;
         [SerializeField] private EquipmentReturnMenu _equipmentReturnMenu;
         [SerializeField] private WarningPanel _warningPanel;
         [SerializeField] private Button _backButton;
-        [SerializeField] private Button _settingsButton;
-        [SerializeField] private GameObject _settingsPanel;
-        [SerializeField] private ControllPanel _controllPanel;
-        [SerializeField] private Button _controllPanelButton;
+        [SerializeField] private Button _additionalButton;
+        [SerializeField] private AdditionalMenu _additionalMenu;
 
         private bool _isLoggedEmployee = false;
         private bool _isLoggedAdmin = false;
         private bool _isRegistrationEnd = false;
         private bool _isReturnEnd = false;
         private bool _isGetEquipmentSelect = false;
-
+        public Action OnButtonClick;
+         public Action<bool> OnEnterAdmin;
+        
+        
         public void Init(SaveLoadService saveLoadService)
         {
             _saveLoadService = saveLoadService;
-            _dataLoader.Init(_saveLoadService);
+            _adminPanel.Init(_saveLoadService);
             _warningPanel.Init(_saveLoadService);
             _employeeRegistrationMenu.Init(_saveLoadService, _warningPanel);
             _switchMenu.Init(_saveLoadService, _warningPanel);
             _equipmentRegistrationMenu.Init(_saveLoadService);
             _equipmentReturnMenu.Init(_saveLoadService, _warningPanel);
-            _controllPanel.Init(_saveLoadService,_warningPanel);
+            _additionalMenu.Init(_saveLoadService,this,_warningPanel);
             AddListeners();
             SentLogMessage("Программа инизиализированна");
         }
@@ -51,12 +52,11 @@ namespace CodeBase.Infrastracture
             _equipmentRegistrationMenu.Work();
             _equipmentReturnMenu.Work();
 
-            _employeeRegistrationMenu.SwithState(true);
+            _employeeRegistrationMenu.SwithPanelState(true);
             _equipmentRegistrationMenu.SwitchValidatorState(false);
-
+            _additionalMenu.Work();
             _switchMenu.SwithState(false);
-            _settingsPanel.SetActive(false);
-            _controllPanel.SwithState(false);
+           
             SentLogMessage("Программа Запущена");
         }
 
@@ -69,16 +69,10 @@ namespace CodeBase.Infrastracture
             _isReturnEnd = false;
             _isGetEquipmentSelect = false;
             _backButton.gameObject.SetActive(true);
-            _dataLoader.Reset();
+            _adminPanel.Reset();
             _employeeRegistrationMenu.Reset();
             _equipmentRegistrationMenu.Reset();
             _equipmentReturnMenu.Reset();
-            
-            _settingsPanel.SetActive(false);
-            _settingsButton.gameObject.SetActive(false);
-            _controllPanel.Reset();
-            _controllPanel.SwithState(true);
-            _controllPanelButton.gameObject.SetActive(true);
             
             Work();
         }
@@ -107,27 +101,24 @@ namespace CodeBase.Infrastracture
         private void OnLoggedAdmin()
         {
             _isLoggedAdmin = true;
-            _employeeRegistrationMenu.SwithState(false);
+            _employeeRegistrationMenu.SwithPanelState(false);
             _switchMenu.SwithState(true);
-            _settingsButton.gameObject.SetActive(true);
-            _settingsButton.interactable=true;
-            _controllPanelButton.gameObject.SetActive(true);
-            _controllPanelButton.interactable = true;
+            _additionalButton.gameObject.SetActive(true);
         }
 
         private void OnLoggedEmployee()
         {
             _isLoggedEmployee = true;
-            _employeeRegistrationMenu.SwithState(false);
+            _employeeRegistrationMenu.SwithPanelState(false);
             _switchMenu.SwithState(true);
         }
 
         private void OnLoggedManager()
         {
             _isLoggedAdmin = true;
-            _employeeRegistrationMenu.SwithState(false);
+            _employeeRegistrationMenu.SwithPanelState(false);
             _switchMenu.SwithState(true);
-            _controllPanelButton.gameObject.SetActive(true);
+            _additionalButton.gameObject.SetActive(true);
         }
         private void CheckPermission()
         {
@@ -157,7 +148,7 @@ namespace CodeBase.Infrastracture
         private void OnReturnApply()
         {
             _employeeRegistrationMenu.Reset();
-            _employeeRegistrationMenu.SwithState(true);
+            _employeeRegistrationMenu.SwithPanelState(true);
             Reset();
         }
 
@@ -165,7 +156,7 @@ namespace CodeBase.Infrastracture
         {
             _equipmentRegistrationMenu.SwitchValidatorState(false);
             _employeeRegistrationMenu.Reset();
-            _employeeRegistrationMenu.SwithState(true);
+            _employeeRegistrationMenu.SwithPanelState(true);
             Reset();
         }
 
@@ -177,14 +168,14 @@ namespace CodeBase.Infrastracture
 
         private void OnReturnEquipment()
         {
-            _controllPanelButton.gameObject.SetActive(false);
+            _additionalButton.gameObject.SetActive(false);
             _switchMenu.SwithState(false);
             _equipmentReturnMenu.SwitchReturnMenuState(true);
         }
 
         private void OnGetEquipment()
         {
-            _controllPanelButton.gameObject.SetActive(false);
+            _additionalButton.gameObject.SetActive(false);
             _isGetEquipmentSelect = true;
             _switchMenu.SwithState(false);
             _equipmentRegistrationMenu.SwitchValidatorState(true);
@@ -194,19 +185,11 @@ namespace CodeBase.Infrastracture
         {
             _saveLoadService.SetDatabase(employees, boxes);
         }
-        private void OpenControllPanel()
-        {
-            _controllPanel.SwithState(true);
-        }
         
-        private void OpenSettingsPanel()
-        {
-           _settingsPanel.SetActive(true);
-        }
-
+       
         private void AddListeners()
         {
-            _dataLoader.Loaded += OnLoaded;
+            _adminPanel.Loaded += OnLoaded;
             _backButton.onClick.AddListener(OnBackButtonClick);
             _employeeRegistrationMenu.OnLogged += CheckPermission;
             _employeeRegistrationMenu.OnLoggedAdmin += OnLoggedAdmin;
@@ -216,14 +199,13 @@ namespace CodeBase.Infrastracture
             _switchMenu.OnReturnEquipment += OnReturnEquipment;
             _equipmentReturnMenu.OnReturnApply += OnReturnApply;
             _equipmentReturnMenu.OnReturnEnd += OnReturnEnd;
-            _controllPanelButton.onClick.AddListener(OpenControllPanel);
-            _settingsButton.onClick.AddListener(OpenSettingsPanel);
+            _additionalButton.onClick.AddListener(OnAdditionalButtonClick);
         }
 
         private void RemuveListeners()
         {
             _backButton.onClick.RemoveListener(OnBackButtonClick);
-            _dataLoader.Loaded -= OnLoaded;
+            _adminPanel.Loaded -= OnLoaded;
             _employeeRegistrationMenu.OnLogged -= CheckPermission;
             _employeeRegistrationMenu.OnLoggedAdmin -= OnLoggedAdmin;
             _equipmentRegistrationMenu.OnApplyRegistration -= OnApplyRegistration;
@@ -232,10 +214,16 @@ namespace CodeBase.Infrastracture
             _switchMenu.OnReturnEquipment -= OnReturnEquipment;
             _equipmentReturnMenu.OnReturnApply -= OnReturnApply;
             _equipmentReturnMenu.OnReturnEnd -= OnReturnEnd;
-            _controllPanelButton.onClick.RemoveListener(OpenControllPanel);
-            _settingsButton.onClick.RemoveListener(OpenSettingsPanel);
+            _additionalButton.onClick.RemoveListener(OnAdditionalButtonClick);
         }
-        
+
+        private void OnAdditionalButtonClick()
+        {
+            OnEnterAdmin?.Invoke(_isLoggedAdmin);
+            _additionalButton.gameObject.SetActive(false);
+            _switchMenu.SwithState(false);
+        }
+
 
         private void SentLogMessage(string message)
         {

@@ -165,3 +165,9 @@ namespace CodeBase.Infrastracture
         }
     }
 }
+
+public class Const
+{
+    public const string DataInfo = "data.txt";
+    public const string LogInfo = "log.txt";
+}
